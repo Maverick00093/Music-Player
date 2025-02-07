@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elegant Music Player</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Global styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #121212;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Header styles */
+      header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        margin: 20px;
+      }
+      header .left {
+        display: flex;
+        align-items: center;
+      }
+      header .left img {
+        width: 50px; /* Adjust the size of the logo */
+        height: 50px; /* Adjust the size of the logo */
+        margin-right: 15px;
+        border-radius: 50%;
+      }
+      header .left h2 {
+        color: #1db954; /* Matching color for the logo text */
+        text-shadow: 0 0 10px #000000; /* Glowing effect */
+      }
+      header .middle {
+        width: 60%;
+        display: flex;
+        justify-content: center;
+      }
+      header .middle input[type="text"] {
+        width: 60%;
+        padding: 12px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        outline: none;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        transition: all 0.3s ease;
+      }
+      header .middle input[type="text"]:focus {
+        border: 1.5px solid #1db954;
+        transition: all 0.3s ease;
+      }
+      header .right button {
+        background-color: #1db954;
+        color: #ffffff;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      header .right button:hover {
+        background-color: #1aa34a;
+      }
+
+      /* Main content area */
+      main {
+        height: 100vh;
+        display: flex;
+        margin: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Playlist on left */
+      .playlist {
+        width: 35%;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        overflow-y: auto;
+        border-radius: 10px 0 0 10px;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+      .playlist h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 24px;
+        font-weight: 600;
+        color: #1db954;
+        text-transform: uppercase;
+      }
+      .playlist ul {
+        list-style: none;
+      }
+      .playlist li {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+      .playlist li:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: translateX(7px);
+      }
+      .playlist li button {
+        background: transparent;
+        border: none;
+        color: #1db954;
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.3s;
+      }
+      .playlist li button:hover {
+        color: #1aa34a;
+      }
+
+      /* Current playing track on right */
+      .current-track {
+        width: 70%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.5s ease;
+        visibility: hidden; /* Initially hide the current track */
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.619),
+          rgba(0, 0, 0, 0.5)
+        );
+        border-radius: 0 10px 10px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      }
+      .current-track img {
+        width: 350px;
+        height: 350px;
+        margin-bottom: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        animation: pulse 1.5s infinite;
+      }
+      .current-track h1 {
+        /* margin-bottom: 1px; */
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      /* Footer music bar */
+      footer {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 0 0 10px 10px;
+        margin: 20px;
+      }
+      .controls {
+        display: flex;
+        gap: 30px;
+      }
+      .controls button {
+        background-color: transparent;
+        color: #1db954;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+        transition: color 0.3s;
+      }
+      .controls button:hover {
+        color: #1aa34a;
+      }
+
+      /* Progress bar */
+      .progress-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        margin: 0 20px;
+      }
+      .progress {
+        width: 100%;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0 10px;
+      }
+      .progress-fill {
+        height: 100%;
+        background: #1db954;
+        width: 0;
+        border-radius: 5px;
+      }
+
+      /* Time indicators */
+      .time {
+        font-size: 14px;
+        color: #ffffff;
+      }
+
+      /* Animations */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Responsive Design */
+@media (max-width: 1200px) {
+  header .middle input[type="text"] {
+    width: 50%;
+  }
+  .playlist {
+    width: 40%;
+  }
+  .current-track {
+    width: 60%;
+  }
+}
+
+@media (max-width: 992px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  header .middle input[type="text"] {
+    width: 80%;
+  }
+  .playlist {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .current-track {
+    width: 100%;
+  }
+  main {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .playlist li {
+    font-size: 14px;
+  }
+  .current-track img {
+    width: 250px;
+    height: 250px;
+  }
+  .current-track h1 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  header .middle input[type="text"] {
+    width: 100%;
+    font-size: 14px;
+  }
+  .playlist {
+    width: 100%;
+  }
+  .playlist li {
+    font-size: 12px;
+    padding: 10px;
+  }
+  .current-track img {
+    width: 200px;
+    height: 200px;
+  }
+  footer .controls button {
+    font-size: 18px;
+  }
+  footer .time {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  header {
+    padding: 10px;
+  }
+  header .middle input[type="text"] {
+    font-size: 12px;
+    padding: 8px;
+  }
+  .current-track h1 {
+    font-size: 16px;
+  }
+  footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  footer .progress-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  footer .progress {
+    width: 100%;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <!-- Header with logo, music player name, search bar, and sign-up button -->
+    <header>
+      <div class="left">
+        <!-- Added logo image before the text -->
+        <img
+          src="https://cdn-icons-png.freepik.com/512/6782/6782912.png"
+          alt="Logo"
+        />
+        <h2>Music Player</h2>
+      </div>
+      <div class="middle">
+        <input
+          type="text"
+          id="search-bar"
+          placeholder="Search tracks..."
+          oninput="searchTracks()"
+        />
+      </div>
+      <div class="right">
+        <button>Sign Up</button>
+      </div>
+    </header>
+
+    <!-- Main body: playlist on the left and current playing track on the right -->
+    <main>
+      <div class="playlist">
+        <h2>Your Playlist</h2>
+        <ul id="playlist">
+          <li id="track-1" onclick="selectTrack(1)">
+            <span>Isq Risk - Song by Rahat Fateh Ali Khan</span>
+            <button onclick="togglePlayPause(1, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-2" onclick="selectTrack(2)">
+            <span>Die With A Smile - Song by Bruno Mars and Lady Gaga</span>
+            <button onclick="togglePlayPause(2, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-3" onclick="selectTrack(3)">
+            <span>Nadaan Parinde - Song by A. R. Rahman and Mohit Chauhan</span>
+            <button onclick="togglePlayPause(3, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-4" onclick="selectTrack(4)">
+            <span
+              >Chokra Jawaan - Song by Amit Trivedi, Sunidhi Chauhan, and Vishal
+              Dadlani</span
+            >
+            <button onclick="togglePlayPause(4, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-5" onclick="selectTrack(5)">
+            <span>Payal - Song by Paradox and Yo Yo Honey Singh</span>
+            <button onclick="togglePlayPause(5, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-6" onclick="selectTrack(6)">
+            <span>Dil Jashn Jashn Bole - Song by Pritam</span>
+            <button onclick="togglePlayPause(6, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-7" onclick="selectTrack(7)">
+            <span>Choo Lo - Song by The Local Train</span>
+            <button onclick="togglePlayPause(7, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-8" onclick="selectTrack(8)">
+            <span>Bombay Dreams - Song by KSHMR and Lost Stories</span>
+            <button onclick="togglePlayPause(8, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-9" onclick="selectTrack(9)">
+            <span>Roz - Song by Nucleya and Ritviz</span>
+            <button onclick="togglePlayPause(9, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+          <li id="track-10" onclick="selectTrack(10)">
+            <span
+              >Ainvayi Ainvayi - Song by Master Saleem and Sunidhi Chauhan</span
+            >
+            <button onclick="togglePlayPause(10, event)">
+              <i class="fas fa-play"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="current-track" id="current-track">
+        <img
+          id="track-image"
+          src="https://via.placeholder.com/200"
+          alt="Album Art"
+        />
+        <h1 id="track-title">Select a track</h1>
+      </div>
+    </main>
+    <!-- Footer with music controls -->
+    <footer>
+      <div class="controls">
+        <button onclick="previousTrack()">
+          <i class="fas fa-backward"></i>
+        </button>
+        <button id="play-pause-btn" onclick="togglePlayPauseFooter()">
+          <i class="fas fa-play" id="play-pause-icon"></i>
+        </button>
+        <button onclick="nextTrack()"><i class="fas fa-forward"></i></button>
+      </div>
+      <div class="progress-container">
+        <span class="time" id="current-time">0:00</span>
+        <div class="progress" onclick="setProgress(event)">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="time" id="duration">0:00</span>
+      </div>
+    </footer>
+
+    <script>
+      const trackColors = [
+        "#ff7b7b", // Color for track 1
+        "#add8e6", // Color for track 2
+        "#f1ac44", // Color for track 3
+        "#d8d22b", // Color for track 4
+        "#249824", // Color for track 5
+        "#e577de", // Color for track 6
+        "#ea2d2d", // Color for track 7
+        "#e6d0a5", // Color for track 8
+        "#000000", // Color for track 9
+        "#a5f7f7", // Color for track 10
+      ];
+      const tracks = [
+        {
+          title: "Isq Risk - Song by Rahat Fateh Ali Khan",
+          src: "Isq_Risk_Full_Song_Mere_Brother_Ki_Dulhan_Katrina_Kaif_Imran_Khan_Rahat_Fateh_Ali_Khan.mp3",
+          image:
+            "https://cdn-images.dzcdn.net/images/cover/97aff7a7994060061ad20cab56410c11/0x1900-000000-80-0-0.jpg",
+        },
+        {
+          title: "Die With A Smile - Song by Bruno Mars and Lady Gaga",
+          src: "Lady Gaga, Bruno Mars - Die With A Smile (Official Music Video).mp3",
+          image:
+            "https://upload.wikimedia.org/wikipedia/en/1/12/Lady_Gaga_and_Bruno_Mars_-_Die_with_a_Smile.png",
+        },
+        {
+          title: "Nadaan Parinde - Song by A. R. Rahman and Mohit Chauhan",
+          src: "ROCKSTAR： Nadaan Parinde (Full Song) ｜ Ranbir Kapoor ｜ A. R. Rahman ｜ Mohit Chauhan ｜ Irshaad Kamil.mp3",
+          image:
+            "https://i.discogs.com/HHJV37tldUj8SkAi4P4MtMvGgwGkiUrD3LhOgPfH6mI/rs:fit/g:sm/q:90/h:540/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTIxMzI2/ODEyLTE2MzkzMzgw/NTYtOTMzMS5qcGVn.jpeg",
+        },
+        {
+          title:
+            "Chokra Jawaan - Song by Amit Trivedi, Sunidhi Chauhan, and Vishal Dadlani",
+          src: "Chokra Jawaan ｜ Full Song ｜ Ishaqzaade ｜ Arjun Kapoor, Gauhar Khan ｜ Amit Trivedi ｜ Sunidhi, Vishal.mp3",
+          image:
+            "https://a10.gaanacdn.com/gn_img/albums/zLp36v3rGe/Lp36avRRKr/size_m.webp",
+        },
+        {
+          title: "Payal - Song by Paradox and Yo Yo Honey Singh",
+          src: "PAYAL SONG (Official Video)： YO YO HONEY SINGH ｜ NORA FATEHI ｜ PARADOX ｜ GLORY ｜ BHUSHAN KUMAR.mp3",
+          image:
+            "https://www.statuszon.com/wp-content/uploads/2024/11/Yo-Yo-Honey-Singhs-New-Payal-Song-Status-Video-Download.jpg",
+        },
+        {
+          title: "Dil Jashn Jashn Bole - Song by Pritam",
+          src: "Dil Jashn Bole ｜ ICC Men's Cricket World Cup 2023 Official Anthem ｜ Pritam.mp3",
+          image:
+            "https://cdn-images.dzcdn.net/images/cover/ce2d0d91fd1df9bb43c7f838fd649435/1900x1900-000000-80-0-0.jpg",
+        },
+        {
+          title: "Choo Lo - Song by The Local Train",
+          src: "The Local Train - Aalas Ka Pedh - Choo Lo (Official Audio).mp3",
+          image:
+            "https://c.saavncdn.com/111/Aalas-Ka-Pedh-Hindi-2015-20231005005130-500x500.jpg",
+        },
+        {
+          title: "Bombay Dreams - Song by KSHMR and Lost Stories",
+          src: "KSHMR & Lost Stories - Bombay Dreams [feat. Kavita Seth].mp3",
+          image:
+            "https://i.scdn.co/image/ab67616d0000b27313cd88a9ce921d2fb44b2fb7",
+        },
+        {
+          title: "Roz - Song by Nucleya and Ritviz",
+          src: "Ritviz & Nucleya - Roz [Official Audio].mp3",
+          image:
+            "https://i1.sndcdn.com/artworks-rVo2H31zhUWe3Oun-aKWRoQ-t1080x1080.jpg",
+        },
+        {
+          title: "Ainvayi Ainvayi - Song by Master Saleem and Sunidhi Chauhan",
+          src: "Ainvayi Ainvayi Song ｜ Band Baaja Baaraat ｜ Ranveer Singh, Anushka Sharma ｜  Sunidhi Chauhan, Salim.mp3",
+          image:
+            "https://c.saavncdn.com/018/Ainvayi-Ainvayi-Best-Wedding-Songs-Collection-Hindi-2015-500x500.jpg",
+        },
+      ];
+      let currentTrackIndex = null;
+      let isPlaying = false;
+      let audioPlayer = new Audio();
+
+      function selectTrack(index) {
+        currentTrackIndex = index - 1;
+        const track = tracks[currentTrackIndex];
+        const trackImage = document.getElementById("track-image");
+        const currentTrack = document.getElementById("current-track");
+
+        // Show the current track section when a track is selected
+        currentTrack.style.visibility = "visible"; // Show current track section
+
+        // Update track title, image, and audio source
+        document.getElementById("track-title").textContent = track.title;
+        audioPlayer.src = track.src;
+
+        // Update the album art
+        trackImage.src = track.image;
+        trackImage.style.display = "block"; // Show album art
+
+        currentTrack.style.backgroundColor = trackColors[currentTrackIndex];
+
+        updatePlayButton();
+        audioPlayer.addEventListener("loadedmetadata", updateDuration);
+        audioPlayer.addEventListener("timeupdate", updateProgress);
+      }
+
+      function playTrack() {
+        audioPlayer.play();
+        isPlaying = true;
+        updatePlayButton();
+        document.getElementById("play-pause-icon").classList.remove("fa-play");
+        document.getElementById("play-pause-icon").classList.add("fa-pause");
+      }
+
+      function pauseTrack() {
+        audioPlayer.pause();
+        isPlaying = false;
+        updatePlayButton();
+        document.getElementById("play-pause-icon").classList.remove("fa-pause");
+        document.getElementById("play-pause-icon").classList.add("fa-play");
+      }
+
+      function togglePlayPause(trackIndex, event) {
+        event.stopPropagation(); // Prevents the playlist li click event
+        if (currentTrackIndex !== trackIndex - 1) {
+          selectTrack(trackIndex);
+          playTrack();
+        } else {
+          if (isPlaying) {
+            pauseTrack();
+          } else {
+            playTrack();
+          }
+        }
+      }
+
+      function togglePlayPauseFooter() {
+        if (isPlaying) {
+          pauseTrack();
+        } else {
+          playTrack();
+        }
+      }
+
+      function updatePlayButton() {
+        const buttons = document.querySelectorAll(".playlist li button");
+        buttons.forEach((button, index) => {
+          if (index === currentTrackIndex) {
+            button.innerHTML = isPlaying
+              ? '<i class="fas fa-pause"></i>'
+              : '<i class="fas fa-play"></i>';
+          } else {
+            button.innerHTML = '<i class="fas fa-play"></i>';
+          }
+        });
+      }
+
+      function previousTrack() {
+        if (currentTrackIndex > 0) {
+          currentTrackIndex--;
+          selectTrack(currentTrackIndex + 1);
+          playTrack();
+        }
+      }
+
+      function nextTrack() {
+        if (currentTrackIndex < tracks.length - 1) {
+          currentTrackIndex++;
+          selectTrack(currentTrackIndex + 1);
+          playTrack();
+        }
+      }
+
+      // Filter tracks based on search input.
+      function searchTracks() {
+        const query = document.getElementById("search-bar").value.trim().toLowerCase();
+        const listItems = document.querySelectorAll("#playlist li");
+
+        listItems.forEach((item) => {
+          const text = item.textContent.toLowerCase();
+          if (text.indexOf(query) > -1) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
+          }
+        });
+      }
+
+      // Update progress bar and time indicators
+      function updateProgress() {
+        const progressFill = document.getElementById("progress-fill");
+        const currentTime = document.getElementById("current-time");
+        const duration = document.getElementById("duration");
+
+        const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progressFill.style.width = `${progress}%`;
+        currentTime.textContent = formatTime(audioPlayer.currentTime);
+      }
+
+      function updateDuration() {
+        const duration = document.getElementById("duration");
+        duration.textContent = formatTime(audioPlayer.duration);
+      }
+
+      function setProgress(event) {
+        const progressContainer = document.querySelector(".progress");
+        const width = progressContainer.clientWidth;
+        const clickX = event.offsetX;
+        const duration = audioPlayer.duration;
+
+        audioPlayer.currentTime = (clickX / width) * duration;
+      }
+
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+      }
+    </script>
+  </body>
+</html>
